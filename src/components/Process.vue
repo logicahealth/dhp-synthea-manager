@@ -3,7 +3,7 @@
     <h1>Synthea Process</h1>
 
     <details>
-      <summary class="columns">
+      <summary class="columns" v-on:click="getPatientFiles()">
         <div class="column is-4">
           <label for="fileCount"># of files to create</label>
           <input v-model='fileCount' id="fileCount" class="" >
@@ -69,34 +69,40 @@
       createPatients: function (count) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/create?population=' + count
-        let processing = this.processingFiles
-        processing = true
+        const self = this
+        self.processingFiles = true
 
         axios.get(url)
           .then(function (response) {
             console.log(response)
-            processing = true
-            while (processing) {
+            let processing = true
+            for (let i = 0; i < 50; i++) {
               processing = checkProcessStatus()
+              console.log(processing)
             }
+            self.processingFiles = false
           })
           .catch(function (error) {
             console.log(error)
           })
+
         function checkProcessStatus () {
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/checkProcess'
-          let processingFiles = true
           axios.get(url)
             .then(function (response) {
-              if (response.running !== undefined && response.running === 'false') {
-                processingFiles = false
+              console.log(response)
+              console.log(response.data.running)
+              if (response !== undefined && response.data.running === false) {
+                return false
+              } else {
+                console.log('response is undefined or process is still running')
+                return true
               }
             })
             .catch(function (error) {
               console.log(error)
             })
-          return processingFiles
         }
       },
       getPatientFiles: function () {  // LIst of Patients to display
@@ -119,6 +125,7 @@
 
         axios.get(url)
           .then(function (response) {
+            console.log(response)
             if (response.files !== undefined && response.files.length > 0) {
               this.fileList = response.files
             }
