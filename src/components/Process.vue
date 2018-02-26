@@ -3,7 +3,7 @@
     <h1>Synthea Process</h1>
 
     <details>
-      <summary class="columns" v-on:click="populateFileList()">
+      <summary class="columns">
         <div class="column is-4">
           <label for="fileCount"># of files to create</label>
           <input v-model='fileCount' id="fileCount" class="" >
@@ -66,35 +66,38 @@
       Stretch
     },
     methods: {
-      createFiles: function (count) {
+      createPatients: function (count) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/create?population=' + count
-        this.processingFiles = true
+        let processing = this.processingFiles
+        processing = true
+
         axios.get(url)
           .then(function (response) {
-            let processStatus = true
-            while (processStatus) {
-              processStatus = this.checkProcessStatus()
+            console.log(response)
+            processing = true
+            while (processing) {
+              processing = checkProcessStatus()
             }
           })
           .catch(function (error) {
             console.log(error)
           })
-      },
-      checkProcessStatus: function () {
-        const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/checkprocess'
-        let processingFiles = this.processingFiles
-        axios.get(url)
-          .then(function (response) {
-            if (response.running !== undefined && response.running === 'false') {
-              processingFiles = false
-            }
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
-        return processingFiles
+        function checkProcessStatus () {
+          const baseUrl = process.env.SYNTHEA_URL
+          const url = baseUrl + 'synthea/checkProcess'
+          let processingFiles = true
+          axios.get(url)
+            .then(function (response) {
+              if (response.running !== undefined && response.running === 'false') {
+                processingFiles = false
+              }
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+          return processingFiles
+        }
       },
       getPatientFiles: function () {  // LIst of Patients to display
         const baseUrl = process.env.SYNTHEA_URL
