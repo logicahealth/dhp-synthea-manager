@@ -3,7 +3,7 @@
 export app_name=dhp-synthea-manager
 
 #Coordinate host port with the reverse proxy config on server where containers are run
-export host_port="8018"
+export host_port="8020"
 
 #Container port is what your app is listening on inside your container.  Spring Boot default = 8080, nginx = 80, tomcat = 8080
 export container_port="80"
