@@ -44,38 +44,6 @@ html {
 
 #app {
   /* Bulma Overrides - Begin */
-  .dxc-spinner {
-    background: $dxc-black
-  }
-  .card, .card-header {
-    border-radius: 3px;
-  }
-  .card {
-    margin-bottom: 20px;
-    &-content {
-      .columns {
-        margin-bottom: 0;
-      }
-      ul {
-        margin-left: 25px;
-      }
-      li {
-        list-style: circle;
-      }
-    }
-    &-source {
-      margin-left:auto;
-      margin-right:0;
-    }
-  }
-  .resource-card-header {
-    padding: 10px;
-    background: rgb(254,255,255);
-    background: -moz-linear-gradient(top, rgba(254,255,255,1) 0%, rgba(237,237,237,1) 35%, rgba(204,204,204,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(254,255,255,1) 0%,rgba(237,237,237,1) 35%,rgba(204,204,204,1) 100%);
-    background: linear-gradient(to bottom, rgba(254,255,255,1) 0%,rgba(237,237,237,1) 35%,rgba(204,204,204,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#cccccc',GradientType=0 );
-  }
   .label {
     margin-bottom: 0.1em;
   }
@@ -184,7 +152,7 @@ html {
   .dxc-menu-toggle {
     position: absolute;
     left: 10px;
-    top: 30px;
+    top: 32px;
     .dxc-btn-menu {
       background: transparent;
       border: 0;
@@ -514,7 +482,7 @@ html {
           font-weight: 500;
         }
       }
-      &-primary, &-secondary {
+      &-primary, &-secondary, &-disabled {
         border-radius: 0;
         cursor: pointer;
         font-family: $dxc-font-bold;
@@ -545,6 +513,56 @@ html {
         &:hover {
           background: $dxc-black;
           color: white
+        }
+      }
+      &-disabled {
+        background: $dxc-grey;
+        border: 1px solid $dxc-grey;
+        color: $dxc-grey-darker;
+        &:hover {
+          cursor: default;
+        }
+      }
+    }
+    .dxc-card {
+      border-radius: 3px;
+      margin-bottom: 20px;
+      .label {
+        display: inline-block;
+        font-weight: 700;
+        &::after {
+          content: " ";
+          white-space: pre;
+        }
+      }
+      .card-header {
+        border-radius: 3px;
+        padding: 10px;
+        background: rgb(254,255,255);
+        background: -moz-linear-gradient(top, rgba(254,255,255,1) 0%, rgba(237,237,237,1) 35%, rgba(204,204,204,1) 100%);
+        background: -webkit-linear-gradient(top, rgba(254,255,255,1) 0%,rgba(237,237,237,1) 35%,rgba(204,204,204,1) 100%);
+        background: linear-gradient(to bottom, rgba(254,255,255,1) 0%,rgba(237,237,237,1) 35%,rgba(204,204,204,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#cccccc',GradientType=0 );
+        &.level {
+          padding: 15px 20px;
+          &:not(:last-child) {
+            margin-bottom: 0;
+          }
+          .level-item {
+            margin-right: 30px;
+            justify-content: left;
+          }
+        }
+      }
+      .card-content {
+        .columns {
+          margin-bottom: 0;
+        }
+        ul {
+          margin-left: 25px;
+        }
+        li {
+          list-style: circle;
         }
       }
     }
