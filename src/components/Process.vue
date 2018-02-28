@@ -2,27 +2,27 @@
   <div>
     <h1>Synthea Process</h1>
 
-    <details>
+    <details id="synthea">
       <summary class="columns">
-        <div class="column is-4">
-          <label for="fileCount"># of files to create</label>
-          <input v-model='fileCount' id="fileCount" class="" >
-        </div>
-        <div class="column is-3">
+        <div class="column">
+          <label class="label" for="fileCount"># of patients to create</label>
+          <span class="control">
+            <input v-model='fileCount' id="fileCount" class="input">
+          </span>
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
         </div>
-        <div class="column is-3">
-          <stretch  background="#202020" v-if="processingFiles === true"></stretch>
+        <div class="column">
+          <stretch  background="#363636" v-if="processingFiles === true"></stretch>
         </div>
       </summary>
 
       <div class="dxc-details-content">
         <div class="columns">
-          <div class="subtitle column is-3">Created Files:</div>
+          <div class="subtitle column">Created Synthetic Patients:</div>
         </div>
         <div v-for="(file, index) in fileList" class="columns">
           <div class="column is-12">
-            <a v-on:click="getPatient(file, index)">{{file.patientName}}</a>
+            <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
             <button class="dxc-btn-link em" v-on:click="sendToVista(file)">Send to Vista</button>
             <tree-view :data="file.patientJSON" :options="{maxDepth: 5, modifiable: false}"></tree-view>
           </div>
@@ -115,6 +115,9 @@
               if (response.data !== undefined && response.data.length > 0) {
                 self.fileList = response.data
               }
+
+              // expand details block
+              document.getElementById('synthea').setAttribute('open', '')
             })
             .catch(function (error) {
               console.log(error)
@@ -163,3 +166,17 @@
     }
   }
 </script>
+
+<style lang="scss" scoped>
+  button {
+    margin-left: 20px;
+  }
+  input {
+    margin: 0 7px;
+    width: 70px;
+  }
+  .label {
+    display: inline-block;
+    margin-top: 7px;
+  }
+</style>
