@@ -67,7 +67,7 @@
       Stretch
     },
     methods: {
-      createPatients: function (count) {
+      createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/create?population=' + count
         const self = this
@@ -76,35 +76,34 @@
         axios.get(url)
           .then(function (response) {
             console.log(response)
-            let processing = true
-            for (let i = 0; i < 100; i++) {
-              processing = checkProcessStatus()
-              console.log(processing)
-            }
-            self.processingFiles = false
-            getPatientFiles(self)
+            checkProcessStatus()
           })
           .catch(function (error) {
             console.log(error)
           })
 
-        function checkProcessStatus () {
+        async function checkProcessStatus () {
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/checkProcess'
-          axios.get(url)
-            .then(function (response) {
-              console.log(response)
-              console.log(response.data.running)
-              if (response !== undefined && response.data.running === false) {
-                return false
-              } else {
-                console.log('response is undefined or process is still running')
-                return true
-              }
-            })
-            .catch(function (error) {
-              console.log(error)
-            })
+          // for (let i = 0; i < 500; i++) {
+          let processing = true
+          while (processing) {
+            await axios.get(url)
+              .then(function (response) {
+                console.log(response)
+                console.log(response.data.running)
+                if (response !== undefined && response.data.running === false) {
+                  processing = false
+                }
+                if (processing === false) {
+                  self.processingFiles = false
+                  getPatientFiles(self)
+                }
+              })
+              .catch(function (error) {
+                console.log(error)
+              })
+          }
         }
         function getPatientFiles (self) {
           // LIst of Patients to display
