@@ -23,10 +23,10 @@
         <div v-for="(file, index) in fileList" class="columns">
           <div class="column is-12">
             <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
-            <button class="dxc-btn-link em" v-on:click="sendToVista(file)">Send to Vista</button>
+            <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
             <div>Vista ICN:
               <stretch  background="#363636" v-if="sendingFile === true"></stretch>
-              <div id="vistaICN"></div>
+              <div :id='"vistaICN_" + index'></div>
             </div>
             <div class="column">
               <stretch  background="#363636" v-if="gettingFile === true"></stretch>
@@ -154,7 +154,7 @@
         Vue.set(file, 'patientJSON', fileData)
         this.gettingFile = false
       },
-      sendToVista: async function (file) {
+      sendToVista: async function (file, index) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
         const self = this
@@ -168,7 +168,8 @@
               console.log(response)
               if (response !== undefined) {
                 processing = false
-                document.getElementById('vistaICN').innerHTML = response.data.icn
+                let id = 'vistaICN_' + index
+                document.getElementById(id).innerHTML = response.data.icn
               }
               if (processing === false) {
                 self.sendingFile = false
