@@ -24,6 +24,13 @@
           <div class="column is-12">
             <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
             <button class="dxc-btn-link em" v-on:click="sendToVista(file)">Send to Vista</button>
+            <div>Vista ICN:
+              <stretch  background="#363636" v-if="sendingFile === true"></stretch>
+              <div id="vistaICN"></div>
+            </div>
+            <div class="column">
+              <stretch  background="#363636" v-if="gettingFile === true"></stretch>
+            </div>
             <tree-view :data="file.patientJSON" :options="{maxDepth: 5, modifiable: false}"></tree-view>
           </div>
         </div>
@@ -58,8 +65,9 @@
           fileName: '',
           patientJSON: {}
         },
-
         processingFiles: false,
+        sendingFile: false,
+        gettingFile: false,
         fileCount: ''
       }
     },
@@ -124,13 +132,15 @@
             })
         }
       },
-      getPatient: function (file, index) {
+      getPatient: async function (file, index) {
         // LIst of Patients to display
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/patient?fileName=' + file.fileName
         console.log(url)
         let fileData
-        axios.get(url)
+        this.gettingFile = true
+
+        await axios.get(url)
           .then(function (response) {
             if (response.data !== undefined) {
               file.patientJSON = response.data
@@ -140,26 +150,34 @@
           .catch(function (error) {
             console.log(error)
           })
+
         Vue.set(file, 'patientJSON', fileData)
+        this.gettingFile = false
       },
-      sendToVista: function (file) {
+      sendToVista: async function (file) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
-        let view = this.files
+        const self = this
+        self.sendingFile = true
 
-        return axios.get(url)
-          .then(function (response) {
-            if (response.data.entry !== undefined) {
-              for (let i = 0; i < response.data.entry.length; i++) {
-
+    // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
+        let processing = true
+        while (processing) {
+          await axios.get(url)
+            .then(function (response) {
+              console.log(response)
+              if (response !== undefined) {
+                processing = false
+                document.getElementById('vistaICN').innerHTML = response.data.icn
               }
-            } else {
-              view.header = 'No ' + view.displayName + ' records found for patient'
-            }
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
+              if (processing === false) {
+                self.sendingFile = false
+              }
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+        }
       }
     },
     beforeMount: function () {
