@@ -79,6 +79,7 @@
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/create?population=' + count
         const self = this
+        self.fileList = []
         self.processingFiles = true
 
         axios.get(url)
