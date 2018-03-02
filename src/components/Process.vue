@@ -22,8 +22,15 @@
         </div>
         <div v-for="(file, index) in fileList" class="columns">
           <div class="column is-12">
-            <a v-on:click="getPatient(file, index)">{{file.patientName}}</a>
-            <button class="dxc-btn-link em" v-on:click="sendToVista(file)">Send to Vista</button>
+            <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
+            <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
+            <div>Vista ICN:
+              <stretch  background="#363636" v-if="sendingFile === true"></stretch>
+              <div :id='"vistaICN_" + index'></div>
+            </div>
+            <div class="column">
+              <stretch  background="#363636" v-if="gettingFile === true"></stretch>
+            </div>
             <tree-view :data="file.patientJSON" :options="{maxDepth: 5, modifiable: false}"></tree-view>
           </div>
         </div>
@@ -71,6 +78,7 @@
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/create?population=' + count
         const self = this
+        self.fileList = []
         self.processingFiles = true
 
         axios.get(url, {withCredentials: true})
@@ -140,24 +148,29 @@
           })
         Vue.set(file, 'patientJSON', fileData)
       },
-      sendToVista: function (file) {
+      sendToVista: async function (file, index) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
-        let view = this.files
+        const self = this
+        self.sendingFile = true
 
-        return axios.get(url, {withCredentials: true})
-          .then(function (response) {
-            if (response.data.entry !== undefined) {
-              for (let i = 0; i < response.data.entry.length; i++) {
-
-              }
-            } else {
-              view.header = 'No ' + view.displayName + ' records found for patient'
+      // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
+        let processing = true
+        while (processing) {
+          await axios.get(url).then(function (response) {
+            console.log(response)
+            if (response !== undefined) {
+              processing = false
+              let id = 'vistaICN_' + index
+              document.getElementById(id).innerHTML = response.data.icn
             }
-          })
-          .catch(function (error) {
+            if (processing === false) {
+              self.sendingFile = false
+            }
+          }).catch(function (error) {
             console.log(error)
           })
+        }
       }
     },
     beforeMount: function () {
