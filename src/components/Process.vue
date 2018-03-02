@@ -2,35 +2,28 @@
   <div>
     <h1>Synthea Process</h1>
 
-    <details id="synthea">
+    <details>
       <summary class="columns">
-        <div class="column">
-          <label class="label" for="fileCount"># of patients to create</label>
-          <span class="control">
-            <input v-model='fileCount' id="fileCount" class="input">
-          </span>
+        <div class="column is-4">
+          <label for="fileCount"># of files to create</label>
+          <input v-model='fileCount' id="fileCount" class="" >
+        </div>
+        <div class="column is-3">
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
         </div>
-        <div class="column">
-          <stretch  background="#363636" v-if="processingFiles === true"></stretch>
+        <div class="column is-3">
+          <stretch  background="#202020" v-if="processingFiles === true"></stretch>
         </div>
       </summary>
 
       <div class="dxc-details-content">
         <div class="columns">
-          <div class="subtitle column">Created Synthetic Patients:</div>
+          <div class="subtitle column is-3">Created Files:</div>
         </div>
         <div v-for="(file, index) in fileList" class="columns">
           <div class="column is-12">
-            <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
+            <a v-on:click="getPatient(file, index)">{{file.patientName}}</a>
             <button class="dxc-btn-link em" v-on:click="sendToVista(file)">Send to Vista</button>
-            <div>Vista ICN:
-              <stretch  background="#363636" v-if="sendingFile === true"></stretch>
-              <div id="vistaICN"></div>
-            </div>
-            <div class="column">
-              <stretch  background="#363636" v-if="gettingFile === true"></stretch>
-            </div>
             <tree-view :data="file.patientJSON" :options="{maxDepth: 5, modifiable: false}"></tree-view>
           </div>
         </div>
@@ -65,9 +58,8 @@
           fileName: '',
           patientJSON: {}
         },
+
         processingFiles: false,
-        sendingFile: false,
-        gettingFile: false,
         fileCount: ''
       }
     },
@@ -75,72 +67,68 @@
       Stretch
     },
     methods: {
-      createPatients: async function (count) {
+      createPatients: function (count) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/create?population=' + count
         const self = this
         self.processingFiles = true
 
-        axios.get(url)
+        axios.get(url, {withCredentials: true})
           .then(function (response) {
             console.log(response)
-            checkProcessStatus()
+            let processing = true
+            while (processing) {
+              processing = checkProcessStatus()
+              console.log(processing)
+            }
+            self.processingFiles = false
+            getPatientFiles(self)
           })
           .catch(function (error) {
             console.log(error)
           })
 
-        async function checkProcessStatus () {
+        function checkProcessStatus () {
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/checkProcess'
-          // for (let i = 0; i < 500; i++) {
-          let processing = true
-          while (processing) {
-            await axios.get(url)
-              .then(function (response) {
-                console.log(response)
-                console.log(response.data.running)
-                if (response !== undefined && response.data.running === false) {
-                  processing = false
-                }
-                if (processing === false) {
-                  self.processingFiles = false
-                  getPatientFiles(self)
-                }
-              })
-              .catch(function (error) {
-                console.log(error)
-              })
-          }
+          axios.get(url, {withCredentials: true})
+            .then(function (response) {
+              console.log(response)
+              console.log(response.data.running)
+              if (response !== undefined && response.data.running === false) {
+                return false
+              } else {
+                console.log('response is undefined or process is still running')
+                return true
+              }
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
         }
         function getPatientFiles (self) {
           // LIst of Patients to display
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/patientFiles'
-          axios.get(url)
+          axios.get(url, {withCredentials: true})
             .then(function (response) {
               console.log(response)
               if (response.data !== undefined && response.data.length > 0) {
                 self.fileList = response.data
               }
-
-              // expand details block
-              document.getElementById('synthea').setAttribute('open', '')
             })
             .catch(function (error) {
               console.log(error)
             })
         }
       },
-      getPatient: async function (file, index) {
+      getPatient: function (file, index) {
         // LIst of Patients to display
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/patient?fileName=' + file.fileName
         console.log(url)
         let fileData
-        this.gettingFile = true
-
-        await axios.get(url)
+        axios.get(url, {withCredentials: true})
           .then(function (response) {
             if (response.data !== undefined) {
               file.patientJSON = response.data
@@ -150,51 +138,29 @@
           .catch(function (error) {
             console.log(error)
           })
-
         Vue.set(file, 'patientJSON', fileData)
-        this.gettingFile = false
       },
-      sendToVista: async function (file) {
+      sendToVista: function (file) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
-        const self = this
-        self.sendingFile = true
+        let view = this.files
 
-    // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
-        let processing = true
-        while (processing) {
-          await axios.get(url)
-            .then(function (response) {
-              console.log(response)
-              if (response !== undefined) {
-                processing = false
-                document.getElementById('vistaICN').innerHTML = response.data.icn
+        return axios.get(url, {withCredentials: true})
+          .then(function (response) {
+            if (response.data.entry !== undefined) {
+              for (let i = 0; i < response.data.entry.length; i++) {
+
               }
-              if (processing === false) {
-                self.sendingFile = false
-              }
-            })
-            .catch(function (error) {
-              console.log(error)
-            })
-        }
+            } else {
+              view.header = 'No ' + view.displayName + ' records found for patient'
+            }
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
       }
     },
     beforeMount: function () {
     }
   }
 </script>
-
-<style lang="scss" scoped>
-  button {
-    margin-left: 20px;
-  }
-  input {
-    margin: 0 7px;
-    width: 70px;
-  }
-  .label {
-    display: inline-block;
-    margin-top: 7px;
-  }
-</style>
