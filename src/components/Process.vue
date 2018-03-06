@@ -164,7 +164,7 @@
     // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
         while (processing) {
-          await axios.get(url)
+          await axios.get(url, {timeout: 360000})
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
