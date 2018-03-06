@@ -25,8 +25,12 @@
             <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
             <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
             <div>Vista ICN:
-              <stretch  background="#363636" v-if="sendingFile === true"></stretch>
+              <stretch  background="#363636" v-if="sendingFileToVista === true"></stretch>
               <div :id='"vistaICN_" + index'></div>
+            </div>
+            <div>OHC ICN:
+              <stretch  background="#363636" v-if="sendingFileToOHC === true"></stretch>
+              <div :id='"ohcICN_" + index'></div>
             </div>
             <div class="column">
               <stretch  background="#363636" v-if="gettingFile === true"></stretch>
@@ -66,7 +70,8 @@
           patientJSON: {}
         },
         processingFiles: false,
-        sendingFile: false,
+        sendingFileToVista: false,
+        sendingFileToOHC: false,
         gettingFile: false,
         fileCount: ''
       }
@@ -157,9 +162,9 @@
       },
       sendToVista: async function (file, index) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
+        const url = baseUrl + 'synthea/processVista?fileName=' + file.fileName
         const self = this
-        self.sendingFile = true
+        self.sendingFileToVista = true
         var instance = axios.create()
 
         // Override timeout default for the library
@@ -173,12 +178,44 @@
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
-                processing = false
                 let id = 'vistaICN_' + index
+                document.getElementById(id).innerHTML = response.data.icn
+                processing = false
+              }
+              if (processing === false) {
+                self.sendingFileToVista = false
+              }
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+        }
+        await self.sendToOHC(file, index)
+      },
+      sendToOHC: async function (file, index) {
+        const baseUrl = process.env.SYNTHEA_URL
+        const url = baseUrl + 'synthea/processOHC?fileName=' + file.fileName
+        const self = this
+        self.sendingFileToOHC = true
+        var instance = axios.create()
+
+        // Override timeout default for the library
+        // Now all requests will wait 2.5 seconds before timing out
+        instance.timeout = 360000
+
+        // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
+        let processing = true
+        while (processing) {
+          await instance.get(url)
+            .then(function (response) {
+              console.log(response)
+              if (response !== undefined) {
+                processing = false
+                let id = 'ohcICN_' + index
                 document.getElementById(id).innerHTML = response.data.icn
               }
               if (processing === false) {
-                self.sendingFile = false
+                self.sendingFileToOHC = false
               }
             })
             .catch(function (error) {
