@@ -160,11 +160,16 @@
         const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
         const self = this
         self.sendingFile = true
+        var instance = axios.create()
+
+        // Override timeout default for the library
+        // Now all requests will wait 2.5 seconds before timing out
+        instance.timeout = 360000
 
     // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
         while (processing) {
-          await axios.get(url, {'timeout': 360000})
+          await instance.get(url)
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
