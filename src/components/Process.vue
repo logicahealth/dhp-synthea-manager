@@ -173,13 +173,15 @@
 
     // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
+        let icn = ''
         while (processing) {
           await instance.get(url)
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
                 let id = 'vistaICN_' + index
-                document.getElementById(id).innerHTML = response.data.icn
+                icn = response.data.icn
+                document.getElementById(id).innerHTML = icn
                 processing = false
               }
               if (processing === false) {
@@ -190,11 +192,11 @@
               console.log(error)
             })
         }
-        await self.sendToOHC(file, index)
+        await self.sendToOHC(file, index, icn)
       },
-      sendToOHC: async function (file, index) {
+      sendToOHC: async function (file, index, icn) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/processOHC?fileName=' + file.fileName
+        const url = baseUrl + 'synthea/processOHC?icn=' + icn
         const self = this
         self.sendingFileToOHC = true
         var instance = axios.create()
