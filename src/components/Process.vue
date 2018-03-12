@@ -82,7 +82,7 @@
     methods: {
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/create?population=' + count
+        const url = baseUrl + 'synthea/synthea-run?population=' + count
         const self = this
         self.fileList = []
         self.processingFiles = true
@@ -98,7 +98,7 @@
 
         async function checkProcessStatus () {
           const baseUrl = process.env.SYNTHEA_URL
-          const url = baseUrl + 'synthea/checkProcess'
+          const url = baseUrl + 'synthea/synthea-progress'
           // for (let i = 0; i < 500; i++) {
           let processing = true
           while (processing) {
@@ -122,7 +122,7 @@
         function getPatientFiles (self) {
           // LIst of Patients to display
           const baseUrl = process.env.SYNTHEA_URL
-          const url = baseUrl + 'synthea/patientFiles'
+          const url = baseUrl + 'synthea/patient-files'
           axios.get(url)
             .then(function (response) {
               console.log(response)
@@ -162,7 +162,7 @@
       },
       sendToVista: async function (file, index) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/processVista?fileName=' + file.fileName
+        const url = baseUrl + 'synthea/vista-export?fileName=' + file.fileName
         const self = this
         self.sendingFileToVista = true
         var instance = axios.create()
@@ -175,7 +175,7 @@
         let processing = true
         let icn = ''
         while (processing) {
-          await instance.get(url)
+          await instance.post(url)
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
@@ -196,7 +196,7 @@
       },
       sendToOHC: async function (file, index, icn) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/processOHC?icn=' + icn
+        const url = baseUrl + 'synthea/ohc-export?icn=' + icn
         const self = this
         self.sendingFileToOHC = true
         var instance = axios.create()
@@ -208,7 +208,7 @@
         // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
         while (processing) {
-          await instance.get(url)
+          await instance.post(url)
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
