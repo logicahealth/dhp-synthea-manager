@@ -25,8 +25,12 @@
             <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
             <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
             <div>Vista ICN:
-              <stretch  background="#363636" v-if="sendingFile === true"></stretch>
+              <stretch  background="#363636" v-if="sendingFileToVista === true"></stretch>
               <div :id='"vistaICN_" + index'></div>
+            </div>
+            <div>OHC ICN:
+              <stretch  background="#363636" v-if="sendingFileToOHC === true"></stretch>
+              <div :id='"ohcICN_" + index'></div>
             </div>
             <div class="column">
               <stretch  background="#363636" v-if="gettingFile === true"></stretch>
@@ -66,7 +70,8 @@
           patientJSON: {}
         },
         processingFiles: false,
-        sendingFile: false,
+        sendingFileToVista: false,
+        sendingFileToOHC: false,
         gettingFile: false,
         fileCount: ''
       }
@@ -77,7 +82,7 @@
     methods: {
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/create?population=' + count
+        const url = baseUrl + 'synthea/synthea-run?population=' + count
         const self = this
         self.fileList = []
         self.processingFiles = true
@@ -93,7 +98,7 @@
 
         async function checkProcessStatus () {
           const baseUrl = process.env.SYNTHEA_URL
-          const url = baseUrl + 'synthea/checkProcess'
+          const url = baseUrl + 'synthea/synthea-progress'
           // for (let i = 0; i < 500; i++) {
           let processing = true
           while (processing) {
@@ -117,7 +122,7 @@
         function getPatientFiles (self) {
           // LIst of Patients to display
           const baseUrl = process.env.SYNTHEA_URL
-          const url = baseUrl + 'synthea/patientFiles'
+          const url = baseUrl + 'synthea/patient-files'
           axios.get(url)
             .then(function (response) {
               console.log(response)
@@ -157,9 +162,9 @@
       },
       sendToVista: async function (file, index) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/processPatientFiles?fileName=' + file.fileName
+        const url = baseUrl + 'synthea/vista-export?fileName=' + file.fileName
         const self = this
-        self.sendingFile = true
+        self.sendingFileToVista = true
         var instance = axios.create()
 
         // Override timeout default for the library
@@ -168,17 +173,51 @@
 
     // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
+        let icn = ''
         while (processing) {
-          await instance.get(url)
+          await instance.post(url)
+            .then(function (response) {
+              console.log(response)
+              if (response !== undefined) {
+                let id = 'vistaICN_' + index
+                icn = response.data.icn
+                document.getElementById(id).innerHTML = icn
+                processing = false
+              }
+              if (processing === false) {
+                self.sendingFileToVista = false
+              }
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+        }
+        await self.sendToOHC(file, index, icn)
+      },
+      sendToOHC: async function (file, index, icn) {
+        const baseUrl = process.env.SYNTHEA_URL
+        const url = baseUrl + 'synthea/ohc-export?icn=' + icn
+        const self = this
+        self.sendingFileToOHC = true
+        var instance = axios.create()
+
+        // Override timeout default for the library
+        // Now all requests will wait 2.5 seconds before timing out
+        instance.timeout = 360000
+
+        // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
+        let processing = true
+        while (processing) {
+          await instance.post(url)
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
                 processing = false
-                let id = 'vistaICN_' + index
+                let id = 'ohcICN_' + index
                 document.getElementById(id).innerHTML = response.data.icn
               }
               if (processing === false) {
-                self.sendingFile = false
+                self.sendingFileToOHC = false
               }
             })
             .catch(function (error) {
