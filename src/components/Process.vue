@@ -37,6 +37,7 @@
               <stretch  background="#363636" v-if="workingOnIt === true"></stretch>
             </div>
           </div>
+          <div id="processResults" class="help is-danger">{{view.processResults}}</div>
         </div>
         <div v-for="(file, index) in fileList" class="columns">
           <div class="column is-12">
@@ -50,7 +51,7 @@
             <div>OHC ICN:
               <span :id='"ohcICN_" + index'></span>
             </div>
-            <tree-view :data="file.patientJSON" :options="{maxDepth: 5, modifiable: false}"></tree-view>
+            <tree-view class='hide':data="file.patientJSON" :options="{maxDepth: 0, modifiable: false}"></tree-view>
           </div>
         </div>
       </div>
@@ -73,7 +74,8 @@
           header: 'Loading...',
           bundles: [],
           bundleName: 'Process',
-          displayName: 'Process'
+          displayName: 'Process',
+          processResults: ''
         },
         msg: 'Process',
         url: process.env.SYNTHEA_URL,
@@ -184,34 +186,43 @@
       },
       getPatient: async function (file, index) {
         // LIst of Patients to display
+        let self = this
+        self.view.processResults = ''
+        self.workingOnIt = true
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/patient?fileName=' + file.fileName
         console.log(url)
         let fileData
-        let self = this
-        self.workingOnIt = true
-
         await axios.get(url)
           .then(function (response) {
             if (response.data !== undefined) {
               file.patientJSON = response.data
               fileData = response.data
+              self.view.processResults = ''
             }
           })
           .catch(function (error) {
             console.log(error)
+            if (error.message !== undefined && error.message === 'Network Error') {
+              self.view.processResults = 'Request has timed-out - try again'
+            } else if (error.response.data !== undefined && error.response.data === 'Invalid CORS request') {
+              self.view.processResults = 'Check your browsers CORS settings - try again'
+            } else {
+              console.log(error)
+              self.view.processResults = 'Error retrieving patient json file'
+            }
           })
 
         Vue.set(file, 'patientJSON', fileData)
         self.workingOnIt = false
       },
       sendToVista: async function (file, index) {
-        const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/vista-export?fileName=' + file.fileName
         const self = this
         self.workingOnIt = true
+        self.view.processResults = ''
+        const baseUrl = process.env.SYNTHEA_URL
+        const url = baseUrl + 'synthea/vista-export?fileName=' + file.fileName
         var instance = axios.create()
-
         // Override timeout default for the library
         // Now all requests will wait 2.5 seconds before timing out
         instance.timeout = 360000
@@ -231,13 +242,22 @@
               }
               if (processing === false) {
                 self.workingOnIt = false
+                self.sendToOHC(file, index, icn)
               }
             })
             .catch(function (error) {
-              console.log(error)
+              self.workingOnIt = false
+              processing = false
+              if (error.message !== undefined && error.message === 'Network Error') {
+                self.view.processResults = 'Request has timed-out - try again'
+              } else if (error.response.data !== undefined && error.response.data === 'Invalid CORS request') {
+                self.view.processResults = 'Check your browsers CORS settings - try again'
+              } else {
+                console.log(error)
+                self.view.processResults = 'Error sending patient json file to vista - try again'
+              }
             })
         }
-        await self.sendToOHC(file, index, icn)
       },
       sendToOHC: async function (file, index, icn) {
         const baseUrl = process.env.SYNTHEA_URL
@@ -263,10 +283,20 @@
               }
               if (processing === false) {
                 self.workingOnIt = false
+                self.view.processResults = ''
               }
             })
             .catch(function (error) {
-              console.log(error)
+              self.workingOnIt = false
+              processing = false
+              if (error.message !== undefined && error.message === 'Network Error') {
+                self.view.processResults = 'Request has timed-out - try again'
+              } else if (error.response.data !== undefined && error.response.data === 'Invalid CORS request') {
+                self.view.processResults = 'Check your browsers CORS settings - try again'
+              } else {
+                console.log(error)
+                self.view.processResults = 'Error retrieving patient json file from vista - try again'
+              }
             })
         }
       }
