@@ -32,22 +32,23 @@
 
       <div class="dxc-details-content">
         <div class="columns">
-          <div class="subtitle column">Created Synthetic Patients:</div>
+          <div class="subtitle column">Created Synthetic Patients:
+            <div>
+              <stretch  background="#363636" v-if="workingOnIt === true"></stretch>
+            </div>
+          </div>
         </div>
         <div v-for="(file, index) in fileList" class="columns">
           <div class="column is-12">
-            <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
-            <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
+            <div>
+              <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
+              <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
+            </div>
             <div>Vista ICN:
-              <stretch  background="#363636" v-if="sendingFileToVista === true"></stretch>
-              <div :id='"vistaICN_" + index'></div>
+              <span :id='"vistaICN_" + index'></span>
             </div>
             <div>OHC ICN:
-              <stretch  background="#363636" v-if="sendingFileToOHC === true"></stretch>
-              <div :id='"ohcICN_" + index'></div>
-            </div>
-            <div class="column">
-              <stretch  background="#363636" v-if="gettingFile === true"></stretch>
+              <span :id='"ohcICN_" + index'></span>
             </div>
             <tree-view :data="file.patientJSON" :options="{maxDepth: 5, modifiable: false}"></tree-view>
           </div>
@@ -84,9 +85,7 @@
           patientJSON: {}
         },
         processingFiles: false,
-        sendingFileToVista: false,
-        sendingFileToOHC: false,
-        gettingFile: false,
+        workingOnIt: false,
         fileCount: '',
         displayFeedback: false,
         isOpSuccess: true,
@@ -189,7 +188,8 @@
         const url = baseUrl + 'synthea/patient?fileName=' + file.fileName
         console.log(url)
         let fileData
-        this.gettingFile = true
+        let self = this
+        self.workingOnIt = true
 
         await axios.get(url)
           .then(function (response) {
@@ -203,13 +203,13 @@
           })
 
         Vue.set(file, 'patientJSON', fileData)
-        this.gettingFile = false
+        self.workingOnIt = false
       },
       sendToVista: async function (file, index) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/vista-export?fileName=' + file.fileName
         const self = this
-        self.sendingFileToVista = true
+        self.workingOnIt = true
         var instance = axios.create()
 
         // Override timeout default for the library
@@ -230,7 +230,7 @@
                 processing = false
               }
               if (processing === false) {
-                self.sendingFileToVista = false
+                self.workingOnIt = false
               }
             })
             .catch(function (error) {
@@ -243,7 +243,7 @@
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/ohc-export?icn=' + icn
         const self = this
-        self.sendingFileToOHC = true
+        self.workingOnIt = true
         var instance = axios.create()
 
         // Override timeout default for the library
@@ -262,7 +262,7 @@
                 document.getElementById(id).innerHTML = response.data.icn
               }
               if (processing === false) {
-                self.sendingFileToOHC = false
+                self.workingOnIt = false
               }
             })
             .catch(function (error) {
