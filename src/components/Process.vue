@@ -2,6 +2,20 @@
   <div>
     <h1>Synthea Process</h1>
 
+    <transition name="fade-menu" mode="out-in">
+      <article v-if="displayFeedback" class="message" :class="isSuccessMessage">
+        <div class="message-header">
+          <p v-if="isOpSuccess">Success</p>
+          <p v-else>Error</p>
+          <button class="delete" aria-label="delete" @click="displayFeedback = false"></button>
+        </div>
+        <div class="message-body">
+          <p v-if="isOpSuccess">Synthea Patient(s) has been created successfully.</p>
+          <p v-else>Error in creating Synthea Patient(s). Please try again later.</p>
+        </div>
+      </article>
+    </transition>
+
     <details id="synthea">
       <summary class="columns">
         <div class="column">
@@ -73,13 +87,37 @@
         sendingFileToVista: false,
         sendingFileToOHC: false,
         gettingFile: false,
-        fileCount: ''
+        fileCount: '',
+        displayFeedback: false,
+        isOpSuccess: true,
+        isSearchValid: true,
+        OP_SUCCESS: true,
+        OP_FAIL: false
       }
     },
     components: {
       Stretch
     },
+    computed: {
+      isErrorControl () {
+        return this.isSearchValid ? '' : 'is-danger'
+      },
+      isSuccessMessage () {
+        return this.isOpSuccess ? 'is-success' : 'is-danger'
+      }
+    },
     methods: {
+      showMessageBox (success) {
+        this.isOpSuccess = success
+        this.displayFeedback = true
+        // temp solution to ensure message box is visible
+        window.scroll(0, 0)
+
+        // auto disappear...
+        setTimeout(() => {
+          this.displayFeedback = false
+        }, 7000)
+      },
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/synthea-run?population=' + count
@@ -94,6 +132,8 @@
           })
           .catch(function (error) {
             console.log(error)
+            self.showMessageBox(self.OP_FAIL)
+            self.processingFiles = false
           })
 
         async function checkProcessStatus () {
@@ -116,6 +156,8 @@
               })
               .catch(function (error) {
                 console.log(error)
+                self.showMessageBox(self.OP_FAIL)
+                self.processingFiles = false
               })
           }
         }
@@ -132,9 +174,12 @@
 
               // expand details block
               document.getElementById('synthea').setAttribute('open', '')
+              self.showMessageBox(self.OP_SUCCESS)
             })
             .catch(function (error) {
               console.log(error)
+              self.showMessageBox(self.OP_FAIL)
+              self.processingFiles = false
             })
         }
       },
