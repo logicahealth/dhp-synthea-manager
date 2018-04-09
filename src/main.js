@@ -139,26 +139,6 @@ function formatPatient (resource) {
   return info
 }
 
-function findPatientByIdentifier (identifier) {
-  console.log('findPatientByIdentifier: identifier: system ' + identifier.system + ' value: ' + identifier.value)
-  const baseUrl = process.env.FHIR_URL
-  const url = baseUrl + 'Patient?id=' + identifier.value + '&meta.tag.display=' + identifier.system
-  axios.get(url)
-    .then(function (response) {
-      console.log(response)
-      if (response.data.entry !== undefined) {
-        response.data.entry.forEach(function (bundle) {
-          let patient = Vue.formatPatient(bundle.resource)
-          console.log('patient id: ' + patient.id)
-          return patient
-        })
-      }
-    })
-    .catch(function (error) {
-      console.log(error)
-    })
-}
-
 function getCode (code) {
   if (code === undefined || code.coding === undefined) {
     return ' '
@@ -216,9 +196,6 @@ const DhPlugin = {
     }
     Vue.formatPatient = function (resource) {
       return formatPatient(resource)
-    }
-    Vue.findPatientByIdentifier = function (identifier) {
-      return findPatientByIdentifier(identifier)
     }
     Vue.getCode = function (code) {
       return getCode(code)
