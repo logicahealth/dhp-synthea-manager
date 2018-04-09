@@ -44,14 +44,15 @@
             <div>
               <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
               <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
+              <span v-if="displayOHC"><button v-if="displayOHC" id="ohcDisplayButton" class="dxc-btn-link em" v-on:click="sendToOHC(file, index)">Send to OHC</button></span>
             </div>
             <div>Vista ICN:
               <span :id='"vistaICN_" + index'></span>
             </div>
-            <div>OHC ICN:
+            <div v-if="displayOHC">OHC ICN:
               <span :id='"ohcICN_" + index'></span>
             </div>
-            <tree-view class='hide':data="file.patientJSON" :options="{maxDepth: 0, modifiable: false}"></tree-view>
+            <tree-view :data="file.patientJSON" :options="{maxDepth: 0, modifiable: false}"></tree-view>
           </div>
         </div>
       </div>
@@ -79,12 +80,14 @@
         },
         msg: 'Process',
         url: process.env.SYNTHEA_URL,
+        displayOHC: false,
         fileList: [],
         file: {
           patientName: '',
           url: '',
           fileName: '',
-          patientJSON: {}
+          patientJSON: {},
+          icn: ''
         },
         processingFiles: false,
         workingOnIt: false,
@@ -238,11 +241,12 @@
                 let id = 'vistaICN_' + index
                 icn = response.data.icn
                 document.getElementById(id).innerHTML = icn
+                file.icn = icn
                 processing = false
               }
               if (processing === false) {
                 self.workingOnIt = false
-                self.sendToOHC(file, index, icn)
+                // self.sendToOHC(file, index, icn)
               }
             })
             .catch(function (error) {
@@ -259,9 +263,10 @@
             })
         }
       },
-      sendToOHC: async function (file, index, icn) {
-        const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/ohc-export?icn=' + icn
+      sendToOHC: async function (file, index) {
+        // https://vista-to-ohc-dev1.openplatform.healthcare/vistatoohcsingle?id=3421854171V257824
+        const baseUrl = process.env.V2O_URL
+        const url = baseUrl + 'vistatoohcsingle?id=' + file.icn
         const self = this
         self.workingOnIt = true
         var instance = axios.create()
@@ -273,13 +278,14 @@
         // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
         while (processing) {
-          await instance.post(url)
+          await instance.get(url)
             .then(function (response) {
               console.log(response)
               if (response !== undefined) {
                 processing = false
                 let id = 'ohcICN_' + index
-                document.getElementById(id).innerHTML = response.data.icn
+                // document.getElementById(id).innerHTML = response.data.icn
+                document.getElementById(id).innerHTML = response.data
               }
               if (processing === false) {
                 self.workingOnIt = false
@@ -302,6 +308,11 @@
       }
     },
     beforeMount: function () {
+      const v2oURL = process.env.V2O_URL
+      console.log(v2oURL)
+      if (v2oURL !== undefined && v2oURL !== '') {
+        this.displayOHC = true
+      }
     }
   }
 </script>
@@ -317,5 +328,12 @@
   .label {
     display: inline-block;
     margin-top: 7px;
+  }
+  .hide {
+    display: none;
+  }
+  .show {
+    animation: fade-in-error 0.5s ease-in forwards;
+  // animation-iteration-count: 3;
   }
 </style>
