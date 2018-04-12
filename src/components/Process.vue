@@ -44,7 +44,7 @@
             <div>
               <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
               <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
-              <span v-if="displayOHC"><button v-if="displayOHC" id="ohcDisplayButton" class="dxc-btn-link em" v-on:click="sendToOHC(file, index)">Send to OHC</button></span>
+              <span v-if="displayOHC"><button :disabled="file.icn !== ''" :id='"ohcButton_" + index' class="dxc-btn-link em" v-on:click="sendToOHC(file, index)">Send to OHC</button></span>
             </div>
             <div>Vista ICN:
               <span :id='"vistaICN_" + index'></span>
@@ -126,6 +126,7 @@
         const baseUrl = process.env.SYNTHEA_URL
         const url = baseUrl + 'synthea/synthea-run?population=' + count
         const self = this
+        self.view.processResults = ''
         self.fileList = []
         self.processingFiles = true
 
@@ -148,7 +149,6 @@
           while (processing) {
             await axios.get(url)
               .then(function (response) {
-                console.log(response)
                 console.log(response.data.running)
                 if (response !== undefined && response.data.running === false) {
                   processing = false
@@ -242,6 +242,8 @@
                 icn = response.data.icn
                 document.getElementById(id).innerHTML = icn
                 file.icn = icn
+                let buttonId = 'ohcButton_' + index
+                document.getElementById(buttonId).removeAttribute('disabled')
                 processing = false
               }
               if (processing === false) {
@@ -275,36 +277,30 @@
         // Now all requests will wait 2.5 seconds before timing out
         instance.timeout = 360000
 
-        // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
-        let processing = true
-        while (processing) {
-          await instance.get(url)
-            .then(function (response) {
-              console.log(response)
-              if (response !== undefined) {
-                processing = false
-                let id = 'ohcICN_' + index
-                // document.getElementById(id).innerHTML = response.data.icn
-                document.getElementById(id).innerHTML = response.data
-              }
-              if (processing === false) {
-                self.workingOnIt = false
-                self.view.processResults = ''
-              }
-            })
-            .catch(function (error) {
-              self.workingOnIt = false
-              processing = false
-              if (error.message !== undefined && error.message === 'Network Error') {
-                self.view.processResults = 'Request has timed-out - try again'
-              } else if (error.response.data !== undefined && error.response.data === 'Invalid CORS request') {
-                self.view.processResults = 'Check your browsers CORS settings - try again'
-              } else {
-                console.log(error)
-                self.view.processResults = 'Error retrieving patient json file from vista - try again'
-              }
-            })
-        }
+        await instance.get(url)
+          .then(function (response) {
+            console.log(response)
+            if (response !== undefined) {
+              let id = 'ohcICN_' + index
+              // document.getElementById(id).innerHTML = response.data.icn
+              document.getElementById(id).innerHTML = response.data.icn
+            }
+
+            self.workingOnIt = false
+            self.view.processResults = ''
+          })
+          .catch(function (error) {
+            self.workingOnIt = false
+            console.log(error)
+            if (error.message !== undefined && error.message === 'Network Error') {
+              self.view.processResults = 'Request has timed-out - try again'
+            } else if (error.response.data !== undefined && error.response.data === 'Invalid CORS request') {
+              self.view.processResults = 'Check your browsers CORS settings - try again'
+            } else {
+              console.log(error)
+              self.view.processResults = 'Error retrieving patient json file from vista - try again'
+            }
+          })
       }
     },
     beforeMount: function () {
@@ -335,5 +331,10 @@
   .show {
     animation: fade-in-error 0.5s ease-in forwards;
   // animation-iteration-count: 3;
+  }
+  button[disabled] {
+    color: #707070 !important;
+    cursor: not-allowed !important;
+    text-decoration: none !important;
   }
 </style>
