@@ -271,6 +271,7 @@
         const url = baseUrl + 'vistatoohcsingle?id=' + file.icn
         const self = this
         self.workingOnIt = true
+        self.view.processResults = ''
         var instance = axios.create()
 
         // Override timeout default for the library
@@ -288,9 +289,7 @@
                 self.view.processResults = response.data.error
               }
             }
-
             self.workingOnIt = false
-            self.view.processResults = ''
           })
           .catch(function (error) {
             self.workingOnIt = false
