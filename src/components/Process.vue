@@ -281,9 +281,12 @@
           .then(function (response) {
             console.log(response)
             if (response !== undefined) {
-              let id = 'ohcICN_' + index
-              // document.getElementById(id).innerHTML = response.data.icn
-              document.getElementById(id).innerHTML = response.data.icn
+              if (response.data.success === true) {
+                let id = 'ohcICN_' + index
+                document.getElementById(id).innerHTML = response.data.icn
+              } else {
+                self.view.processResults = response.data.error
+              }
             }
 
             self.workingOnIt = false
