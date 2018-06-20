@@ -25,7 +25,7 @@
           </span>
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
         </div>
-        <div class="column">
+        <div class="column prsp-wait">
           <stretch  background="#363636" v-if="processingFiles === true"></stretch>
         </div>
       </summary>
@@ -339,5 +339,7 @@
     cursor: not-allowed !important;
     text-decoration: none !important;
   }
-
+  .prsp-wait {
+    padding-top: 18px;
+  }
 </style>
