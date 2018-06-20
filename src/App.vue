@@ -82,7 +82,7 @@
 </script>
 
 <style lang="scss">
-  @import '~bulma/bulma';
   @import './assets/css/dhp';
+  @import '~bulma/bulma';
 </style>
 

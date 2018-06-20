@@ -1,52 +1,46 @@
-@font-face {
-  font-family: 'GT-Walsheim-Pro-Regular';
-  src: url('./assets/font/GT-Walsheim-Pro-Regular.eot?#iefix') format('embedded-opentype'),
-  url('./assets/font/GT-Walsheim-Pro-Regular.woff') format('woff')
-}
 
-@font-face {
-  font-family: 'GT-Walsheim-Pro-Bold';
-  src: url('./assets/font/GT-Walsheim-Pro-Bold.eot?#iefix') format('embedded-opentype'),
-  url('./assets/font/GT-Walsheim-Pro-Bold.woff') format('woff')
-}
-
-@font-face {
-  font-family: 'GT-Walsheim-Pro-Light';
-  src: url('./assets/font/GT-Walsheim-Pro-Light.eot?#iefix') format('embedded-opentype'),
-  url('./assets/font/GT-Walsheim-Pro-Light.woff') format('woff')
-}
-
-$dxc-font-regular: 'GT-Walsheim-Pro-Regular', Helvetica, Arial, sans-serif;
-$dxc-font-bold: 'GT-Walsheim-Pro-Bold', Helvetica, Arial, sans-serif;
-$dxc-font-light: 'GT-Walsheim-Pro-Light', Helvetica, Arial, sans-serif;
-$dxc-black: #202020;
-$dxc-blue: #309dcf;
-$dxc-green: #64ff00;
-$dxc-grey: #d9d9d9;
-$dxc-grey-dark: darken($dxc-grey, 10%);
-$dxc-grey-darker: darken($dxc-grey, 20%);//#666666;
-$dxc-red: #E84444;
-$dxc-yellow: #ffed00;
-$dxc-header-height: 120px;
-$dxc-nav-width: 220px;
-$dxc-footer-height: 80px;
-$dxc-patient-max-width: 750px;
-$dxc-patient-min-width: 600px;
+$perspecta-font-regular: Arial, Helvetica, sans-serif;
+$perspecta-font-bold: Arial, Helvetica, sans-serif;
+$perspecta-font-light: Arial, Helvetica, sans-serif;
+$perspecta-black: #000000;
+$perspecta-white: #ffffff;
+$perspecta-blue: #0F45FF;
+$perspecta-red: #FF671F;
+$perspecta-light-blue: #D5E7EF;
+$perspecta-green: #63DC3D;
+$perspecta-grey: #4C534C;
+$perspecta-grey-light: lighten($perspecta-grey, 25%);
+$perspecta-grey-dark: darken($perspecta-grey, 10%);
+$perspecta-grey-darker: #D5E7EF;
+$perspecta-yellow: #FFD700;
+$perspecta-header-height: 120px;
+$perspecta-nav-width: 220px;
+$perspecta-nav-gray: #d8d8d8;
+$perspecta-footer-height: 80px;
+$perspecta-patient-max-width: 750px;
+$perspecta-patient-min-width: 600px;
+$success: $perspecta-green;
 
 html, body {
   height: 100%;
 }
 
 html {
-  background: $dxc-black url('./assets/img/bg_clouds.jpg') center center no-repeat fixed;
+  background: $perspecta-black url('./assets/img/adult-africa-african-1089550.jpg') center center no-repeat fixed;
   background-size: cover;
 }
 
 #app {
   /* Bulma Overrides - Begin */
+
+  input[type="text"], input[type="password"], select, textarea {
+    background-color : $perspecta-light-blue;
+  }
+
   .label {
     margin-bottom: 0.1em;
   }
+
   .notification {
     form {
       background: #fff;
@@ -60,21 +54,30 @@ html {
       background: #fdfdfd;
     }
     .subtitle {
-      font-family: $dxc-font-regular;
+      font-family: $perspecta-font-regular;
       font-style: italic;
       font-size: 1.2rem;
     }
   }
   .select:not(.is-multiple)::after {
-    border: 1px solid $dxc-grey-darker;
+    border: 1px solid $perspecta-blue;
+    border-color: $perspecta-blue;
     border-right: 0;
     border-top: 0;
   }
+
+  .select select, input {
+    border-color: $perspecta-light-blue;
+  }
   .select select.is-danger {
-    border-color: #ff3860;
+    border-color: $perspecta-red;
   }
   .select.is-small {
     font-size: 0.85rem;
+  }
+
+  .notification {
+    background-color: $perspecta-nav-gray;
   }
   /* Bulma Overrides - End */
 
@@ -88,7 +91,7 @@ html {
   }
   @keyframes slide-in-menu {
     from {
-      transform: translateX(-$dxc-nav-width);
+      transform: translateX(-$perspecta-nav-width);
     }
     to {
       transform: translateX(0);
@@ -99,7 +102,7 @@ html {
       transform: translateX(0);
     }
     to {
-      transform: translateX(-$dxc-nav-width);
+      transform: translateX(-$perspecta-nav-width);
     }
   }
 
@@ -127,7 +130,7 @@ html {
   }
   @keyframes slide-in-patient {
     from {
-      transform: translateX($dxc-patient-min-width);
+      transform: translateX($perspecta-patient-min-width);
     }
     to {
       transform: translateX(0);
@@ -138,14 +141,14 @@ html {
       transform: translateX(0);
     }
     to {
-      transform: translateX($dxc-patient-min-width);
+      transform: translateX($perspecta-patient-min-width);
     }
   }
   /* Animations - End */
 
-  font-family: $dxc-font-regular;
+  font-family: $perspecta-font-regular;
   .dxc-content-wrapper {
-    background: rgba(32,32,32,0.75);
+    background: rgba(0,0,0,0.75);
     display: flex;
     height: 100%;
   }
@@ -166,12 +169,12 @@ html {
   }
   .dxc-patient-info {
     &-expanded, &-collapsed {
-      background: $dxc-black;
-      border: 1px solid $dxc-grey-darker;
+      background: $perspecta-white;
+      border: 1px solid $perspecta-black;
       border-radius: 3px;
-      box-shadow: -1px -1px 5px $dxc-grey-darker;
-      color: white;
-      font-family: $dxc-font-light;
+      box-shadow: 2px 2px 4px $perspecta-grey-light;
+      color: black;
+      font-family: $perspecta-font-light;
       height: 100px;
       opacity: 0.98;
       margin: 10px 20px;
@@ -197,7 +200,7 @@ html {
         top: 30px;
         right: 15px;
         a {
-          color: white;
+          color: black;
         }
         .material-icons {
           font-size: 36px;
@@ -221,18 +224,18 @@ html {
       }
     }
     &-expanded {
-      max-width: $dxc-patient-max-width;
-      min-width: $dxc-patient-min-width;
+      max-width: $perspecta-patient-max-width;
+      min-width: $perspecta-patient-min-width;
       .details {
         display: inline-block;
-        color: $dxc-grey;
+        color: $perspecta-grey;
         font-size: 0.8rem;
         padding-right: 10px;
         position: relative;
         left: 200px;
         .label {
           font-size: 0.8rem;
-          color: $dxc-grey;
+          color: $perspecta-grey;
           margin-bottom: 0;
         }
         .address {
@@ -262,28 +265,29 @@ html {
 
   /* Header/Banner */
   header {
-    background: $dxc-black;
+    background: $perspecta-white;
     opacity: 0.92;
-    height: $dxc-header-height;
+    height: $perspecta-header-height;
     width:100%;
     .logo {
-      background: transparent url('./assets/img/dxc_logo.png') no-repeat 70px 40px;
+      background: transparent url('./assets/img/logo_perspecta.png') no-repeat;
       display: inline-block;
-      height: $dxc-footer-height;
-      width: 295px;
+      margin-left: 70px;
+      height: 40px;
+      width: 183px;
+      margin-top: 43px;
     }
   }
 
   /* Navigation Left Sidebar */
   nav {
-    background: $dxc-grey;
-    opacity: 0.9;
-    font-family: $dxc-font-light;
+    background: $perspecta-nav-gray;
+    font-family: $perspecta-font-light;
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    flex: 1 0 $dxc-nav-width;
-    max-width: $dxc-nav-width; /* prevent auto (fat) width before main content finished loading */
+    flex: 1 0 $perspecta-nav-width;
+    max-width: $perspecta-nav-width; /* prevent auto (fat) width before main content finished loading */
 
     h1 {
       background: rgb(45,45,45);
@@ -291,19 +295,19 @@ html {
       background: -webkit-linear-gradient(top, rgba(45,45,45,1) 0%,rgba(32,32,32,1) 100%);
       background: linear-gradient(to bottom, rgba(45,45,45,1) 0%,rgba(32,32,32,1) 100%);
       filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2d2d2d', endColorstr='#202020',GradientType=0 );
-      color: $dxc-yellow;
-      font-family: $dxc-font-light;
+      color: $perspecta-yellow;
+      font-family: $perspecta-font-light;
       font-size: 1.1rem;
       height: 57px;
       padding: 15px 5px 15px 20px;
     }
 
     .dxc-menu {
-      padding: 0 15px 15px 20px;
+      padding: 0 15px 20px 20px;
       a {
-        color: black;
+        color: #4C534C;
         &:hover {
-          border-bottom: 2px solid $dxc-black;
+          border-bottom: 2px solid $perspecta-black;
         }
       }
       li {
@@ -312,7 +316,7 @@ html {
           margin-top: 10px;
         }
         &.search {
-          border-bottom: 1px solid $dxc-grey-dark;
+          border-bottom: 1px solid $perspecta-grey-dark;
         }
         .material-icons {
           font-size: 18px;
@@ -333,20 +337,20 @@ html {
   main {
     flex: 1 1 auto;
     height: 100%;
-    min-height: calc(100vh - #{$dxc-header-height} - #{$dxc-footer-height});
+    min-height: calc(100vh - #{$perspecta-header-height} - #{$perspecta-footer-height});
     overflow: hidden;
     padding: 20px;
     a {
-      border-bottom: 2px solid $dxc-yellow;
-      color: $dxc-black;
+      border-bottom: 2px solid $perspecta-blue;
+      color: $perspecta-black;
       &:hover {
-        border-bottom: 2px solid $dxc-black;
+        border-bottom: 2px solid $perspecta-black;
       }
       text-decoration: none;
     }
     details {
       background: #F4F4F4;
-      border: 1px solid $dxc-grey;
+      border: 1px solid $perspecta-grey;
       border-radius: 3px;
       margin-bottom: 30px;
       padding: 11px 11px 0 11px;
@@ -357,19 +361,22 @@ html {
         background: linear-gradient(to bottom, rgba(254,255,255,1) 0%,rgba(237,237,237,1) 35%,rgba(204,204,204,1) 100%);
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#cccccc',GradientType=0 );
 
-        border: 1px solid $dxc-grey;
+        border: 1px solid $perspecta-grey;
         border-bottom: 0;
         border-radius: 3px;
         cursor: pointer;
         margin-bottom: 0;
+        padding-bottom: 5px;
         padding-right: 30px;
 
         &::-webkit-details-marker {
-          background: $dxc-yellow;
-          border-radius: 10px;
-          color: $dxc-black;
-          font-size: 1rem;
-          padding: 5px;
+          background: $perspecta-blue;
+          border-radius: 13px;
+          color: $perspecta-white;
+          font-size: 1.1rem;
+          padding: 6px;
+          margin-left: 7px;
+          margin-top: 7px;
         }
         .first-column-offset {
           margin-right: 18px
@@ -385,10 +392,10 @@ html {
         .subtitle{
           font-style: italic;
           font-size: 1.3rem;
-          font-family: $dxc-font-regular;
+          font-family: $perspecta-font-regular;
         }
         .hint {
-          color: $dxc-grey-darker;
+          color: $perspecta-grey;
           font-style: italic;
           padding: 5px 10px 25px 0;
         }
@@ -398,15 +405,17 @@ html {
       margin-top: 10px;
     }
     h1 {
-      font-family: $dxc-font-regular;
+      font-family: $perspecta-font-regular;
       font-size: 1.4rem;
-      color: white;
+      color: $perspecta-white;
+      font-weight: bold;
       margin-top: -8px;
       margin-bottom: 20px;
       padding-bottom: 12px;
       &.no-nav {
         margin: auto;
         max-width: 380px;
+        color: $perspecta-black;
       }
       /*&::after {
         content: " ";
@@ -420,7 +429,7 @@ html {
     }
     h2 {
       color: black;
-      font-family: $dxc-font-bold;
+      font-family: $perspecta-font-bold;
       font-size: 1.2rem;
       margin-bottom: 20px;
     }
@@ -461,7 +470,7 @@ html {
       &-link {
         background: transparent;
         border: 0;
-        color: $dxc-blue;
+        color: $perspecta-blue;
         cursor: pointer;
         font-size: 1rem;
         padding: 5px 0;
@@ -473,7 +482,7 @@ html {
           text-decoration: underline;
         }
         &.remove {
-          color: $dxc-red;
+          color: $perspecta-red;
         }
         &.primary {
           margin-right: 12px;
@@ -485,7 +494,7 @@ html {
       &-primary, &-secondary, &-disabled {
         border-radius: 0;
         cursor: pointer;
-        font-family: $dxc-font-bold;
+        font-family: $perspecta-font-bold;
         font-size: 0.9rem;
         margin: 0 10px 10px 0;
         min-width: 100px;
@@ -497,28 +506,28 @@ html {
         }
       }
       &-primary {
-        background: $dxc-yellow;
-        border: 1px solid $dxc-yellow;
-        color: $dxc-black;
+        background: $perspecta-blue;
+        border: 1px solid $perspecta-blue;
+        color: $perspecta-white;
         &:hover {
-          background: $dxc-black;
-          border-color: $dxc-black;
-          color: $dxc-yellow;
+          background: $perspecta-nav-gray;
+          color: $perspecta-blue;
+          border: 1px solid $perspecta-nav-gray;
         }
       }
       &-secondary {
         background: white;
         border: 1px solid #777;
-        color: $dxc-black;
+        color: $perspecta-black;
         &:hover {
-          background: $dxc-black;
+          background: $perspecta-black;
           color: white
         }
       }
       &-disabled {
-        background: $dxc-grey;
-        border: 1px solid $dxc-grey;
-        color: $dxc-grey-darker;
+        background: $perspecta-grey;
+        border: 1px solid $perspecta-grey;
+        color: $perspecta-grey-darker;
         &:hover {
           cursor: default;
         }
@@ -568,7 +577,7 @@ html {
     }
     .dxc-main-bg {
       background: white;
-      border-radius: 2px;
+      border-radius: 3px;
       padding: 5px;
       min-height: 100px
     }
@@ -592,9 +601,10 @@ html {
       }
     }
     .dxc-search-tile {
-      background-color: $dxc-grey;
-      border: 1px solid $dxc-grey-darker;
-      border-radius: 5px;
+      background-color: $perspecta-white;
+      border: 1px solid $perspecta-grey-darker;
+      border-radius: 3px;
+      box-shadow: 2px 2px 4px $perspecta-grey-light;
       padding: 20px;
       margin: 12px auto;
       max-width: 380px;
@@ -603,7 +613,7 @@ html {
         max-width: 750px;
         min-width: 500px;
         hr {
-          background-color: $dxc-grey-dark;
+          background-color: $perspecta-grey-dark;
         }
         select {
           width: 220px;
@@ -617,17 +627,53 @@ html {
       }
     }
   }
+  /* Dashboard */
+  .condition {
+    background: $perspecta-blue;
+  }
 
+  .encounter {
+    background: $perspecta-yellow;
+  }
+
+  .medication {
+    background: $perspecta-green;
+  }
+
+  .procedure {
+    background: $perspecta-black;
+  }
+
+  /* Observation charts */
+  .line-chart g {
+    background-color: $perspecta-white;
+  }
+  .line-chart .line {
+    fill: none;
+    stroke: $perspecta-blue;
+    stroke-width: 3px;
+  }
+  .line-chart .systolic {
+    fill: none;
+    stroke: $perspecta-blue;
+    stroke-width: 3px;
+  }
+
+  .line-chart .diastolic {
+    fill: none;
+    stroke: $perspecta-green;
+    stroke-width: 3px;
+  }
   /* Footer */
   footer {
     box-shadow: 0 -2px 10px #333;
-    font-family: $dxc-font-light;
+    font-family: $perspecta-font-light;
     font-size: 0.8rem;
     color: white;
     width: 100%;
-    background: $dxc-black;
+    background: $perspecta-black;
     opacity: 0.98;
-    min-height: $dxc-footer-height;
+    min-height: $perspecta-footer-height;
     padding: 20px 80px;
     /*position: absolute;
     right: 0;
@@ -637,7 +683,7 @@ html {
       margin-bottom: 10px;
       > a {
         margin-left: 25px;
-        color: $dxc-yellow;
+        color: $perspecta-yellow;
       }
       > span {
         color: white;

@@ -19,9 +19,9 @@
     <details id="synthea">
       <summary class="columns">
         <div class="column">
-          <label class="label" for="fileCount"># of patients to create</label>
+          <label class="label" for="fileCount"># of patients to create:</label>
           <span class="control">
-            <input v-model='fileCount' id="fileCount" class="input">
+            <input v-model='fileCount' id="fileCount" class="input" type="text"/>
           </span>
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
         </div>
@@ -325,7 +325,7 @@
   }
   .label {
     display: inline-block;
-    margin-top: 7px;
+    margin-top: 12px;
   }
   .hide {
     display: none;
@@ -339,4 +339,5 @@
     cursor: not-allowed !important;
     text-decoration: none !important;
   }
+
 </style>
