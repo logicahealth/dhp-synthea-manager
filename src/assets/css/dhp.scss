@@ -263,10 +263,17 @@ html {
     margin: 25% 50%;
   }
 
+  .source-link {
+    border-bottom: 2px solid $perspecta-blue;
+    color: $perspecta-black;
+    &:hover {
+      border-bottom: 2px solid $perspecta-black;
+    }
+    text-decoration: none;
+  }
   /* Header/Banner */
   header {
     background: $perspecta-white;
-    opacity: 0.92;
     height: $perspecta-header-height;
     width:100%;
     .logo {
