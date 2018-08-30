@@ -44,6 +44,7 @@
             <div>
               <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
               <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
+              <button class="dxc-btn-link em" v-on:click="getVizData(file, index)">OSEHRA Patient Visualization</button>
               <span v-if="displayOHC"><button :disabled="file.icn !== ''" :id='"ohcButton_" + index' class="dxc-btn-link em" v-on:click="sendToOHC(file, index)">Send to OHC</button></span>
             </div>
             <div>Vista ICN:
@@ -218,6 +219,35 @@
 
         Vue.set(file, 'patientJSON', fileData)
         self.workingOnIt = false
+      },
+      getVizData: async function (file, index) {
+        const self = this
+        self.workingOnIt = true
+        self.view.processResults = ''
+        const url = 'https://code.osehra.org/synthea/synthea_upload.php'
+        const baseUrl = process.env.SYNTHEA_URL
+        const dataURL = baseUrl + 'synthea/patient?fileName=' + file.fileName
+        var instance = axios.create()
+        var instance2 = axios.create()
+        instance.timeout = 360000
+        instance.get(dataURL).then(function (response) {
+          instance2.put(url, response.data, {
+            headers: {
+              'content-type': 'application/json'
+            }
+          }).then(function (putResp) {
+            if (putResp !== undefined) {
+              var visWindow = window.open('', '_blank')
+              visWindow.document.write(putResp.data)
+            }
+          })
+          .catch(function (error) {
+            console.log(error)
+            if (error.message !== undefined && error.message === 'Network Error') {
+              self.view.processResults = 'Request has timed-out - try again'
+            }
+          })
+        })
       },
       sendToVista: async function (file, index) {
         const self = this
