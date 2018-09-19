@@ -222,7 +222,6 @@
       },
       getVizData: async function (file, index) {
         const self = this
-        self.workingOnIt = true
         self.view.processResults = ''
         const url = 'https://code.osehra.org/synthea/synthea_upload.php'
         const baseUrl = process.env.SYNTHEA_URL
@@ -239,6 +238,7 @@
             if (putResp !== undefined) {
               var visWindow = window.open('', '_blank')
               visWindow.document.write(putResp.data)
+              visWindow.document.close()
             }
           })
           .catch(function (error) {
