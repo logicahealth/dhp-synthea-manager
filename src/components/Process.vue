@@ -39,13 +39,22 @@
           </div>
           <div id="processResults" class="help is-danger">{{view.processResults}}</div>
         </div>
+        <span> Known Problems
+          <button class="dxc-btn-link em" v-on:click="filterVal = '*'"> Clear Filter</button>
+        </span>
+        <ul style="columns:4;">
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in totalProblems.sort()" v-bind:class="{active: problem === filterVal}" v-on:click="filterVal = problem">{{problem}}</li>
+        </ul>
+        <hr>
         <div v-for="(file, index) in fileList" class="columns">
-          <div class="column is-12">
+          <div  v-if="(filterVal == '*')|| (file.problems.includes(filterVal))" class="column is-12">
             <div>
               <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
               <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
               <button class="dxc-btn-link em" v-on:click="getVizData(file, index)">OSEHRA Patient Visualization</button>
               <span v-if="displayOHC"><button :disabled="file.icn !== ''" :id='"ohcButton_" + index' class="dxc-btn-link em" v-on:click="sendToOHC(file, index)">Send to OHC</button></span>
+              </br>
+
             </div>
             <div>Vista ICN:
               <span :id='"vistaICN_" + index'></span>
@@ -96,8 +105,10 @@
         displayFeedback: false,
         isOpSuccess: true,
         isSearchValid: true,
+        filterVal: '*',
         OP_SUCCESS: true,
-        OP_FAIL: false
+        OP_FAIL: false,
+        totalProblems: []
       }
     },
     components: {
@@ -170,13 +181,21 @@
           // LIst of Patients to display
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/patient-files'
+          self.totalProblems = []
+          self.filterVal = '*'
           axios.get(url)
             .then(function (response) {
               console.log(response)
               if (response.data !== undefined && response.data.length > 0) {
                 self.fileList = response.data
               }
-
+              self.fileList.forEach(function (file) {
+                file.problems.forEach(function (problem) {
+                  if (!self.totalProblems.includes(problem)) {
+                    self.totalProblems.push(problem)
+                  }
+                })
+              })
               // expand details block
               document.getElementById('synthea').setAttribute('open', '')
               self.showMessageBox(self.OP_SUCCESS)
@@ -359,6 +378,9 @@
   }
   .hide {
     display: none;
+  }
+  .active{
+    font-weight: bold;
   }
   .show {
     animation: fade-in-error 0.5s ease-in forwards;
