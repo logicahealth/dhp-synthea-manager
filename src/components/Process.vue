@@ -40,14 +40,19 @@
           <div id="processResults" class="help is-danger">{{view.processResults}}</div>
         </div>
         <span> Known Problems
-          <button class="dxc-btn-link em" v-on:click="filterVal = '*'"> Clear Filter</button>
+          <button class="dxc-btn-link em" v-on:click="filterVal = []"> Clear Filter</button>
         </span>
+        <h6>Currently Selected Problems</h6>
         <ul style="columns:4;">
-          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in totalProblems.sort()" v-bind:class="{active: problem === filterVal}" v-on:click="filterVal = problem">{{problem}}</li>
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in filterVal.sort()" v-on:click="filterProblems(problem)">{{problem}}</li>
+        </ul>
+        <hr>
+        <ul style="columns:4;">
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in totalProblems.sort()" v-bind:class="{active: filterVal.includes(problem)}" v-on:click="filterProblems(problem)">{{problem}}</li>
         </ul>
         <hr>
         <div v-for="(file, index) in fileList" class="columns">
-          <div  v-if="(filterVal == '*')|| (file.problems.includes(filterVal))" class="column is-12">
+          <div  v-if="(filterVal.length == 0)|| (filterVal.every(val => file.problems.includes(val)))" class="column is-12">
             <div>
               <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
               <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
@@ -105,7 +110,7 @@
         displayFeedback: false,
         isOpSuccess: true,
         isSearchValid: true,
-        filterVal: '*',
+        filterVal: [],
         OP_SUCCESS: true,
         OP_FAIL: false,
         totalProblems: []
@@ -133,6 +138,14 @@
         setTimeout(() => {
           this.displayFeedback = false
         }, 7000)
+      },
+      filterProblems: function (problem) {
+        const self = this
+        if (this.filterVal.indexOf(problem) !== -1) {
+          self.filterVal = self.filterVal.filter(word => word !== problem)
+        } else {
+          self.filterVal.push(problem)
+        }
       },
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
@@ -182,7 +195,7 @@
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/patient-files'
           self.totalProblems = []
-          self.filterVal = '*'
+          self.filterVal = []
           axios.get(url)
             .then(function (response) {
               console.log(response)
