@@ -52,7 +52,7 @@
         </ul>
         <hr>
         <ul style="columns:4;">
-          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in totalProblems.sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}}</li>
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in Object.keys(totalProblems).sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}} ({{totalProblems[problem]}})</li>
         </ul>
         <hr>
         <div v-for="(file, index) in fileList" class="columns">
@@ -213,7 +213,7 @@
           // LIst of Patients to display
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/patient-files'
-          self.totalProblems = []
+          self.totalProblems = {}
           self.posFilter = []
           self.negFilter = []
           axios.get(url)
@@ -223,10 +223,13 @@
                 self.fileList = response.data
               }
               self.fileList.forEach(function (file) {
-                file.problems.forEach(function (problem) {
-                  if (!self.totalProblems.includes(problem)) {
-                    self.totalProblems.push(problem)
+                // Creates a unique list of problems to ensure multiple instances
+                // of the same problem are not counted
+                [...new Set(file.problems)].forEach(function (problem) {
+                  if (Object.keys(self.totalProblems).indexOf(problem) === -1) {
+                    self.totalProblems[problem] = 0
                   }
+                  self.totalProblems[problem]++
                 })
               })
               // expand details block
