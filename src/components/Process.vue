@@ -356,7 +356,7 @@
       getVizData: async function (file, index) {
         const self = this
         self.view.processResults = ''
-        const url = 'https://code.osehra.org/synthea/synthea_upload.php'
+        const url = process.env.VIZ_URL
         const baseUrl = process.env.SYNTHEA_URL
         const dataURL = baseUrl + 'synthea/patient?fileName=' + file.fileName
         var instance = axios.create()
