@@ -40,14 +40,23 @@
           <div id="processResults" class="help is-danger">{{view.processResults}}</div>
         </div>
         <span> Known Problems
-          <button class="dxc-btn-link em" v-on:click="filterVal = '*'"> Clear Filter</button>
+          <button class="dxc-btn-link em" v-on:click="posFilter = [];negFilter=[]"> Clear Filter</button>
         </span>
+        <h6>Showing patient with these problems</h6>
         <ul style="columns:4;">
-          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in totalProblems.sort()" v-bind:class="{active: problem === filterVal}" v-on:click="filterVal = problem">{{problem}}</li>
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in posFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
+        </ul>
+        <h6>and without:</h6>
+        <ul style="columns:4;">
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in negFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
+        </ul>
+        <hr>
+        <ul style="columns:4;">
+          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in Object.keys(totalProblems).sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}} ({{totalProblems[problem]}})</li>
         </ul>
         <hr>
         <div v-for="(file, index) in fileList" class="columns">
-          <div  v-if="(filterVal == '*')|| (file.problems.includes(filterVal))" class="column is-12">
+          <div  v-if="filterProblems(file.problems)" class="column is-12">
             <div>
               <a v-on:click="getPatient(file, index)" title="View patient details">{{file.patientName}}</a>
               <button class="dxc-btn-link em" v-on:click="sendToVista(file, index)">Send to Vista</button>
@@ -105,7 +114,8 @@
         displayFeedback: false,
         isOpSuccess: true,
         isSearchValid: true,
-        filterVal: '*',
+        posFilter: [],
+        negFilter: [],
         OP_SUCCESS: true,
         OP_FAIL: false,
         totalProblems: []
@@ -133,6 +143,28 @@
         setTimeout(() => {
           this.displayFeedback = false
         }, 7000)
+      },
+      filterProblems: function (problems) {
+        var show = true
+        if (this.posFilter.length === 0 && this.negFilter.length === 0) {
+          return show
+        }
+        show = this.posFilter.every(cond => problems.includes(cond))
+        if (show && (this.negFilter.length > 0)) {
+          show = !this.negFilter.every(cond => problems.includes(cond))
+        }
+        return show
+      },
+      updateFilters: function (problem) {
+        const self = this
+        if (this.posFilter.indexOf(problem) !== -1) {
+          self.posFilter = self.posFilter.filter(word => word !== problem)
+          self.negFilter.push(problem)
+        } else if (this.negFilter.indexOf(problem) !== -1) {
+          self.negFilter = self.negFilter.filter(word => word !== problem)
+        } else {
+          self.posFilter.push(problem)
+        }
       },
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
@@ -181,8 +213,9 @@
           // LIst of Patients to display
           const baseUrl = process.env.SYNTHEA_URL
           const url = baseUrl + 'synthea/patient-files'
-          self.totalProblems = []
-          self.filterVal = '*'
+          self.totalProblems = {}
+          self.posFilter = []
+          self.negFilter = []
           axios.get(url)
             .then(function (response) {
               console.log(response)
@@ -190,10 +223,13 @@
                 self.fileList = response.data
               }
               self.fileList.forEach(function (file) {
-                file.problems.forEach(function (problem) {
-                  if (!self.totalProblems.includes(problem)) {
-                    self.totalProblems.push(problem)
+                // Creates a unique list of problems to ensure multiple instances
+                // of the same problem are not counted
+                [...new Set(file.problems)].forEach(function (problem) {
+                  if (Object.keys(self.totalProblems).indexOf(problem) === -1) {
+                    self.totalProblems[problem] = 0
                   }
+                  self.totalProblems[problem]++
                 })
               })
               // expand details block
@@ -381,6 +417,10 @@
   }
   .active{
     font-weight: bold;
+  }
+  .negative {
+    font-weight: bold;
+    color: red !important;
   }
   .show {
     animation: fade-in-error 0.5s ease-in forwards;
