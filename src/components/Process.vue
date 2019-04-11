@@ -16,11 +16,11 @@
       </article>
     </transition>
 
-    <details id="synthea">
+    <details open id="synthea">
         <summary  class="columns">
           Generate Patients
         </summary>
-        <details class="column">
+        <details open class="column">
           <summary  class="columns">
             <h3> Parameters: </h3>
           </summary>
