@@ -25,33 +25,66 @@
             <h3> Parameters: </h3>
           </summary>
           <div class="dxc-details-content">
-			  <label class="label" for="fileCount"># of patients to create:</label>
-			  <span class="control">
-				<input v-model='fileCount' id="fileCount" class="input" type="text"/>
-			  </span>
-			  <label class="label" for="state">State:</label>
-			  <span class="control">
-				<input style='width: 150px;' v-model='state' id="state" class="input" type="text"/>
-			  </span>
-			  <label class="label" for="city">City limitation:</label>
-			  <span class="control">
-				<input style='width: 150px;' v-model='city' id="city" class="input" type="text"/>
-			  </span>
-			  <label class="label" for="minAge">Minimum Age:</label>
-			  <span class="control">
-				<input v-model='minAge' id="minAge" class="input" type="text"/>
-			  </span>
-			  <label class="label" for="maxAge">Maximum Age:</label>
-			  <span class="control">
-				<input v-model='maxAge' id="maxAge" class="input" type="text"/>
-			  </span>
-			  <label class="label" for="gender">Gender limitation:</label>
-			  <span class="control">
-				<input v-model='gender' id="gender" class="input" type="text"/>
-			  </span>
-
-			  <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
-          </div>
+          <table>
+            <tr>
+              <td>
+                <label class="label" for="fileCount"># of patients to create:</label>
+                <span class="control">
+                <input v-model='fileCount' id="fileCount" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="state">State:</label>
+                <span class="control">
+                <input style='width: 150px;' v-model='state' id="state" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="city">City limitation:</label>
+                <span class="control">
+                <input style='width: 150px;' v-model='city' id="city" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="minAge">Minimum Age:</label>
+                <span class="control">
+                <input v-model='minAge' id="minAge" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="maxAge">Maximum Age:</label>
+                <span class="control">
+                <input v-model='maxAge' id="maxAge" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="gender">Gender limitation:</label>
+                <span class="control">
+                <input v-model='gender' id="gender" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="seed">Seed Value:</label>
+                <span class="control">
+                <input style="width: 150px;" v-model='seed' id="seed" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+          </table>
+          <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
+            </div>
         </details>
         <div class="column prsp-wait">
           <stretch  background="#363636" v-if="processingFiles === true"></stretch>
@@ -149,6 +182,8 @@
         minAge: '0',
         city: '',
         gender: '',
+        seed: '',
+        years: '10',
         displayFeedback: false,
         isOpSuccess: true,
         isSearchValid: true,
@@ -212,6 +247,7 @@
         url += '&city=' + this.city
         url += '&minAge=' + this.minAge
         url += '&maxAge=' + this.maxAge
+        url += '&seed=' + this.seed
         const self = this
         self.view.processResults = ''
         self.fileList = []
