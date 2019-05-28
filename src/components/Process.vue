@@ -16,19 +16,79 @@
       </article>
     </transition>
 
-    <details id="synthea">
-      <summary class="columns">
-        <div class="column">
-          <label class="label" for="fileCount"># of patients to create:</label>
-          <span class="control">
-            <input v-model='fileCount' id="fileCount" class="input" type="text"/>
-          </span>
+    <details open id="synthea">
+        <summary  class="columns">
+          Generate Patients
+        </summary>
+        <details open class="column">
+          <summary  class="columns">
+            <h3> Parameters: </h3>
+          </summary>
+          <div class="dxc-details-content">
+          <table>
+            <tr>
+              <td>
+                <label class="label" for="fileCount"># of patients to create:</label>
+                <span class="control">
+                <input v-model='fileCount' id="fileCount" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="state">State:</label>
+                <span class="control">
+                <input style='width: 150px;' v-model='state' id="state" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="city">City limitation:</label>
+                <span class="control">
+                <input style='width: 150px;' v-model='city' id="city" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="minAge">Minimum Age:</label>
+                <span class="control">
+                <input v-model='minAge' id="minAge" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="maxAge">Maximum Age:</label>
+                <span class="control">
+                <input v-model='maxAge' id="maxAge" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="gender">Gender limitation:</label>
+                <span class="control">
+                <input v-model='gender' id="gender" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="label" for="seed">Seed Value:</label>
+                <span class="control">
+                <input style="width: 150px;" v-model='seed' id="seed" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
+          </table>
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
-        </div>
+            </div>
+        </details>
         <div class="column prsp-wait">
           <stretch  background="#363636" v-if="processingFiles === true"></stretch>
         </div>
-      </summary>
 
       <div class="dxc-details-content">
         <div class="columns">
@@ -39,21 +99,27 @@
           </div>
           <div id="processResults" class="help is-danger">{{view.processResults}}</div>
         </div>
-        <span> Known Problems
-          <button class="dxc-btn-link em" v-on:click="posFilter = [];negFilter=[]"> Clear Filter</button>
-        </span>
-        <h6>Showing patient with these problems</h6>
-        <ul style="columns:4;">
-          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in posFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
-        </ul>
-        <h6>and without:</h6>
-        <ul style="columns:4;">
-          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in negFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
-        </ul>
-        <hr>
-        <ul style="columns:4;">
-          <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in Object.keys(totalProblems).sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}} ({{totalProblems[problem]}})</li>
-        </ul>
+        <details>
+         <summary class="columns">
+           <h3> Known Problems</h3>
+         </summary>
+        <div class="dxc-details-content">
+			<button class="dxc-btn-link em" v-on:click="posFilter = [];negFilter=[]"> Clear Filter</button>
+			</span>
+			<h6>Showing patient with these problems</h6>
+			<ul style="columns:4;">
+			  <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in posFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
+			</ul>
+			<h6>and without:</h6>
+			<ul style="columns:4;">
+			  <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in negFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
+			</ul>
+			<hr>
+			<ul style="columns:4;">
+			  <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in Object.keys(totalProblems).sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}} ({{totalProblems[problem]}})</li>
+			</ul>
+		</div>
+		</details>
         <hr>
         <div v-for="(file, index) in fileList" class="columns">
           <div  v-if="filterProblems(file.problems)" class="column is-12">
@@ -111,6 +177,13 @@
         processingFiles: false,
         workingOnIt: false,
         fileCount: '',
+        state: 'Massachusetts',
+        maxAge: '140',
+        minAge: '0',
+        city: '',
+        gender: '',
+        seed: '',
+        years: '10',
         displayFeedback: false,
         isOpSuccess: true,
         isSearchValid: true,
@@ -168,7 +241,13 @@
       },
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
-        const url = baseUrl + 'synthea/synthea-run?population=' + count
+        var url = baseUrl + 'synthea/synthea-run?population=' + count
+        url += '&state=' + this.state
+        url += '&gender=' + this.gender
+        url += '&city=' + this.city
+        url += '&minAge=' + this.minAge
+        url += '&maxAge=' + this.maxAge
+        url += '&seed=' + this.seed
         const self = this
         self.view.processResults = ''
         self.fileList = []
