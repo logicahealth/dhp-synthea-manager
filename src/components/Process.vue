@@ -104,21 +104,22 @@
            <h3> Known Problems</h3>
          </summary>
         <div class="dxc-details-content">
-			<button class="dxc-btn-link em" v-on:click="posFilter = [];negFilter=[]"> Clear Filter</button>
-			</span>
-			<h6>Showing patient with these problems</h6>
-			<ul style="columns:4;">
-			  <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in posFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
-			</ul>
-			<h6>and without:</h6>
-			<ul style="columns:4;">
-			  <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in negFilter.sort()" v-on:click="updateFilters(problem)">{{problem}}</li>
-			</ul>
-			<hr>
-			<ul style="columns:4;">
-			  <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in Object.keys(totalProblems).sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}} ({{totalProblems[problem]}})</li>
-			</ul>
-		</div>
+          <button class="dxc-btn-link em" v-on:click="posFilter = [];negFilter=[]"> Clear Filter</button>
+          </span>
+          <h6>Showing patient with these problems</h6>
+          <ul style="columns:4;">
+            <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in posFilter" v-bind:key="problem" v-on:click="updateFilters(problem)">{{problem}}</li>
+          </ul>
+          </ul>
+          <h6>and without:</h6>
+          <ul style="columns:4;">
+            <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in negFilter" v-bind:key="problem" v-on:click="updateFilters(problem)">{{problem}}</li>
+          </ul>
+          <hr>
+          <ul style="columns:4;">
+            <li class="dxc-btn-link" style="font-size: 70%;" v-for="problem in Object.keys(totalProblems).sort()" v-bind:class="{active: posFilter.includes(problem), negative: negFilter.includes(problem)}" v-on:click="updateFilters(problem)">{{problem}} ({{totalProblems[problem]}})</li>
+          </ul>
+        </div>
 		</details>
         <hr>
         <div v-for="(file, index) in fileList" class="columns">
