@@ -245,8 +245,7 @@
         url += '&state=' + this.state
         url += '&gender=' + this.gender
         url += '&city=' + this.city
-        url += '&minAge=' + this.minAge
-        url += '&maxAge=' + this.maxAge
+        url += '&ageRange=' + this.minAge + '-' + this.maxAge
         url += '&seed=' + this.seed
         const self = this
         self.view.processResults = ''
