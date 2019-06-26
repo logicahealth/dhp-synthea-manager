@@ -364,7 +364,7 @@
         var instance2 = axios.create()
         instance.timeout = 360000
         instance.get(dataURL).then(function (response) {
-          instance2.put(url, response.data, {
+          instance2.post(url, response.data, {
             headers: {
               'content-type': 'application/json'
             }
