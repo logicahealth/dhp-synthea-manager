@@ -3,7 +3,6 @@ FROM nginx:1.14.0-alpine
 RUN apk update && \
     apk upgrade && \
     apk add nodejs && \
-    npm install -g npm@latest && \
     npm rebuild bcrypt --build-from-source
 
 WORKDIR /opt/manager
