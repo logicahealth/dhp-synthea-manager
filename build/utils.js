@@ -15,7 +15,8 @@ exports.cssLoaders = function (options) {
   var cssLoader = {
     loader: 'css-loader',
     options: {
-      minimize: process.env.NODE_ENV === 'production',
+      // from GitHub: https://github.com/webpack-contrib/css-loader/issues/863
+      // minimize: process.env.NODE_ENV === 'production',
       sourceMap: options.sourceMap
     }
   }
