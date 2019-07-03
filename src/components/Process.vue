@@ -374,9 +374,7 @@
               visWindow.document.write(putResp.data)
               visWindow.document.close()
             }
-          })
-          .catch(function (error) {
-            console.log(error)
+          }).catch(function (error) {
             if (error.message !== undefined && error.message === 'Network Error') {
               self.view.processResults = 'Request has timed-out - try again'
             }
@@ -394,7 +392,7 @@
         // Now all requests will wait 2.5 seconds before timing out
         instance.timeout = 360000
 
-    // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
+        // {"vistaSuccess":true,"ohcSuccess":false,"error":null,"icn":"5123457820V116090"}
         let processing = true
         let icn = ''
         while (processing) {
