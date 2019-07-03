@@ -86,16 +86,10 @@
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
             </div>
         </details>
-        <div class="column prsp-wait">
-          <stretch  background="#363636" v-if="processingFiles === true"></stretch>
-        </div>
 
       <div class="dxc-details-content">
         <div class="columns">
           <div class="subtitle column">Created Synthetic Patients:
-            <div>
-              <stretch  background="#363636" v-if="workingOnIt === true"></stretch>
-            </div>
           </div>
           <div id="processResults" class="help is-danger">{{view.processResults}}</div>
         </div>
@@ -121,6 +115,9 @@
           </ul>
         </div>
 		</details>
+        <div class="column prsp-wait">
+          <stretch  background="#363636" v-if="(processingFiles === true)||(workingOnIt === true)"></stretch>
+        </div>
         <hr>
         <div v-for="(file, index) in fileList" class="columns">
           <div  v-if="filterProblems(file.problems)" class="column is-12">
