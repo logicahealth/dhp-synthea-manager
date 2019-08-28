@@ -82,6 +82,14 @@
                 </span>
               </td>
             </tr>
+            <tr>
+              <td>
+                <label class="label" for="years">'Years of History' to create (Enter 0 for all history):</label>
+                <span class="control">
+                <input style="width: 150px;" v-model='years' id="years" class="input" type="text"/>
+                </span>
+              </td>
+            </tr>
           </table>
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
             </div>
@@ -248,6 +256,7 @@
         url += '&city=' + this.city
         url += '&ageRange=' + this.minAge + '-' + this.maxAge
         url += '&seed=' + this.seed
+        url += '&yearsOfData=' + this.years
         const self = this
         self.view.processResults = ''
         self.fileList = []
