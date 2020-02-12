@@ -1,0 +1,82 @@
+{
+  "allergic_rhinitis": [],
+  "allergies": [],
+  "anemia___unknown_etiology": [],
+  "appendicitis": [],
+  "asthma": [],
+  "atopy": [],
+  "attention_deficit_disorder": [],
+  "breast_cancer": [],
+  "bronchitis": [],
+  "cardiovascular_disease": [],
+  "colorectal_cancer": [],
+  "congestive_heart_failure": [],
+  "contraceptive_maintenance": [],
+  "contraceptives": [],
+  "copd": [],
+  "cystic_fibrosis": [],
+  "dementia": [],
+  "dermatitis": [],
+  "dialysis": [],
+  "ear_infections": [],
+  "epilepsy": [],
+  "female_reproduction": [],
+  "fibromyalgia": [],
+  "food_allergies": [],
+  "gallstones": [],
+  "gout": [],
+  "homelessness": [],
+  "hypertension": [],
+  "hypothyroidism": [],
+  "injuries": [
+    "osteoporosis"
+  ],
+  "lifecycle": [],
+  "lung_cancer": [
+    "veteran_lung_cancer"
+  ],
+  "lupus": [],
+  "med_rec": [],
+  "metabolic_syndrome_care": [],
+  "metabolic_syndrome_disease": [],
+  "mtbi": [],
+  "opioid_addiction": [
+    "veteran_substance_abuse_conditions"
+  ],
+  "osteoarthritis": [
+    "veteran"
+  ],
+  "osteoporosis": [],
+  "pregnancy": [],
+  "quality_of_life": [],
+  "rheumatoid_arthritis": [],
+  "self_harm": [],
+  "sexual_activity": [],
+  "sinusitis": [],
+  "sore_throat": [],
+  "total_joint_replacement": [],
+  "urinary_tract_infections": [],
+  "veteran": [],
+  "veteran_hyperlipidemia": [
+    "veteran"
+  ],
+  "veteran_lung_cancer": [
+    "lung_cancer"
+  ],
+  "veteran_mdd": [
+    "veteran"
+  ],
+  "veteran_prostate_cancer": [
+    "veteran"
+  ],
+  "veteran_ptsd": [
+    "veteran"
+  ],
+  "veteran_self_harm": [],
+  "veteran_substance_abuse_conditions": [],
+  "veteran_substance_abuse_treatment": [
+    "opioid_addiction"
+  ],
+  "weight_loss": [],
+  "wellness_encounters": []
+}

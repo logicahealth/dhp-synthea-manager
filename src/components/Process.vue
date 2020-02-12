@@ -91,6 +91,19 @@
               </td>
             </tr>
           </table>
+          <details>
+              <summary  class="columns">
+                <h3>Select modules:</h3>
+              </summary>
+              <div>
+                  <ul style="columns:3;">
+                    <li type='checkbox' class="dxc-btn-link" style="font-size: 70%;" v-for="module in Object.keys(moduleList).sort()">
+                        <input style="width: 150px;" type="checkbox"  v-on:click="updateModules(module)" :disabled="requiredModules.includes(module)" :checked="requiredModules.includes(module)||selectedModules.includes(module)" />
+                        <label v-on:click="updateModules(module)">{{module}}:</label>
+                    </li>
+                  </ul>
+              </div>
+          </details>
           <button class="dxc-btn-link em" v-on:click="createPatients(fileCount)">Create Patients</button>
             </div>
         </details>
@@ -155,6 +168,7 @@
   import TreeView from 'vue-json-tree-view'
   import Vue from 'vue'
   import {Stretch} from 'vue-loading-spinner'
+  import json from '../assets/modules.json'
 
   Vue.use(TreeView)
 
@@ -197,7 +211,11 @@
         negFilter: [],
         OP_SUCCESS: true,
         OP_FAIL: false,
-        totalProblems: []
+        totalProblems: {},
+        moduleList: {},
+        selectedModules: [],
+        requiredModules: [],
+        moduleJson: json
       }
     },
     components: {
@@ -234,6 +252,19 @@
         }
         return show
       },
+      updateModules: function (module) {
+        const self = this
+        if (this.selectedModules.indexOf(module) === -1) {
+          this.selectedModules.push(module)
+          this.requiredModules = this.requiredModules.concat(this.moduleList[module])
+        } else {
+          this.selectedModules = this.selectedModules.filter(word => word !== module)
+          self.requiredModules = []
+          this.selectedModules.forEach(function (add) {
+            self.requiredModules = self.requiredModules.concat(self.moduleList[add])
+          })
+        }
+      },
       updateFilters: function (problem) {
         const self = this
         if (this.posFilter.indexOf(problem) !== -1) {
@@ -247,6 +278,9 @@
       },
       createPatients: async function (count) {
         const baseUrl = process.env.SYNTHEA_URL
+        // Assume *nix path separator, ":", as path separator needed to properly
+        // separate module names in Synthea command.
+        var modulestring = this.requiredModules.concat(this.selectedModules).join(':')
         var url = baseUrl + 'synthea/synthea-run?population=' + count
         url += '&state=' + this.state
         url += '&gender=' + this.gender
@@ -254,6 +288,7 @@
         url += '&ageRange=' + this.minAge + '-' + this.maxAge
         url += '&seed=' + this.seed
         url += '&yearsOfData=' + this.years
+        url += '&modules=' + modulestring
         const self = this
         self.view.processResults = ''
         self.fileList = []
@@ -479,6 +514,7 @@
       if (v2oURL !== undefined && v2oURL !== '') {
         this.displayOHC = true
       }
+      this.moduleList = this.moduleJson
     }
   }
 </script>
